@@ -1,0 +1,74 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+# Overall Accuracy is: 41.22
+
+model:
+  arch: blip2_t5_okvqa_select
+
+  #  model_type: pretrain_flant5xxl
+  model_type: pretrain_flant5xl
+  #  model_type: instruct_flant5xxl
+  load_finetuned: False
+  use_grad_checkpoint: True
+  freeze_vit: True
+  max_txt_len: 256
+  qformer_text_input: False
+  knowledge_num: 5
+  use_lora: True
+  task: 'train_qa'
+
+  image_size: 224
+  #  prompt: "Question: {} Short answer:"
+  prompt: "Question: {} \n Knowledge: {} \n Answer:"
+
+datasets:
+  ok_vqa: # name of the dataset builder
+    vis_processor:
+        train:
+          name: "blip_image_eval"
+          image_size: 224
+        eval:
+          name: "blip_image_eval"
+          image_size: 224
+    text_processor:
+        train:
+          name: "blip_question"
+        eval:
+          name: "blip_question"
+#     build_info:
+#         images:
+#             storage: '/export/share/datasets/vision/coco/images/'
+
+run:
+  task: vqa
+  # optimization-specific
+  batch_size_train: 1
+  batch_size_eval: 1
+  num_workers: 4
+
+  # inference-specific
+  max_len: 10
+  min_len: 1
+  num_beams: 5
+  inference_method: "generate"
+#  prompt: "Question: {} Short answer:"
+#  prompt: "Question: {} Knowledge: {} Short answer:"
+  prompt: "Question: {} Knowledge: {} Answer:"
+#  prompt: "Answer the question according to the knowledge concepts and candidates. \n\n Question: {} \n Concepts: {} \n Candidates: {} \n Answer:"
+#  prompt: "Question: {} \n Knowledge: {} \n Is this knowledge helpful to answer the question? \n Please answer True/False. \n Answer"
+
+  seed: 42
+  output_dir: "output/blip2_flant5xl/OKVQA_zeroshot"
+
+  evaluate: True
+#  test_splits: ["train", "test"]
+  test_splits: ["test"]
+
+  # distribution-specific
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
