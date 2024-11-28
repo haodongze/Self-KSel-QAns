@@ -51,6 +51,10 @@ bash run_scripts/blip2/train/train_fvqa_flant5xl_select.sh
 ```bash
 bash run_scripts/blip2/train/train_aokvqa_flant5xl_select.sh
 ```
+## Checkpoints
+We have uploaded the checkpoints of lora and fc layer on OKVQA in huggingface https://huggingface.co/echohao1996/Self-KSel-QAns/tree/main
+
+When loading, please note that you need to load the original q-former parameters first.
 
 ##  Acknowledgements
 
